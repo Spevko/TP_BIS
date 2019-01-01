@@ -120,10 +120,17 @@ class AesEnc:
 
     @staticmethod
     def scp_to_remote(loc_file, remote_file, remote_ip, remote_user, remote_password):
-        transport = paramiko.Transport(("{}".format(remote_ip), 22))
-        transport.connect(username=remote_user, password=remote_password)
-        sftp = paramiko.SFTPClient.from_transport(transport)
+        #transport = paramiko.Transport(("{}".format(remote_ip), 22))
+        #transport.connect(username=remote_user, password=remote_password)
+        #sftp = paramiko.SFTPClient.from_transport(transport)
+        #sftp.put("{}".format(loc_file), "{}".format(remote_file))
+        ssh = paramiko.SSHClient()
+        ssh.load_system_host_keys()
+        ssh.connect(remote_ip, username=remote_user, password=remote_password, timeout=25)
+        sftp = ssh.open_sftp()
         sftp.put("{}".format(loc_file), "{}".format(remote_file))
+        sftp.close()
+        ssh.close()
 
     @staticmethod
     def scp_from_remote(remote_file, loc_file, remote_ip, remote_user, remote_password):
