@@ -10,7 +10,7 @@ import paramiko
 
 
 # All file arguments should contain full path to file
-class AesEnc:
+class Sec:
 
     @staticmethod
     def gen_rsa(file_name):
@@ -126,7 +126,7 @@ class AesEnc:
         #sftp.put("{}".format(loc_file), "{}".format(remote_file))
         ssh = paramiko.SSHClient()
         ssh.load_system_host_keys()
-        ssh.connect(remote_ip, username=remote_user, password=remote_password, timeout=25)
+        ssh.connect(remote_ip, username=remote_user, password=remote_password, timeout=30)
         sftp = ssh.open_sftp()
         sftp.put("{}".format(loc_file), "{}".format(remote_file))
         sftp.close()
@@ -134,7 +134,14 @@ class AesEnc:
 
     @staticmethod
     def scp_from_remote(remote_file, loc_file, remote_ip, remote_user, remote_password):
-        transport = paramiko.Transport(("{}".format(remote_ip), 22))
-        transport.connect(username=remote_user, password=remote_password)
-        sftp = paramiko.SFTPClient.from_transport(transport)
+        ssh = paramiko.SSHClient()
+        ssh.load_system_host_keys()
+        ssh.connect(remote_ip, username=remote_user, password=remote_password, timeout=30)
+        sftp = ssh.open_sftp()
         sftp.get("{}".format(remote_file), "{}".format(loc_file))
+        sftp.close()
+        ssh.close()
+        #transport = paramiko.Transport(("{}".format(remote_ip), 22))
+        #transport.connect(username=remote_user, password=remote_password)
+        #sftp = paramiko.SFTPClient.from_transport(transport)
+        #sftp.get("{}".format(remote_file), "{}".format(loc_file))
