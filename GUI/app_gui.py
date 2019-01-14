@@ -112,15 +112,16 @@ class App:
             rsa_key = fd.askopenfilename(title="select public key", initialdir=os.getenv("HOME"))
             if not rsa_key:
                 raise ValueError("no RSA key file selected!")
-            path = fd.asksaveasfilename(title="save as", initialdir=os.getenv("HOME"))
+            path = fd.askdirectory(title="save in", initialdir=os.getenv("HOME"))
             if not path:
                 raise ValueError("no path provided!")
-            if filename == path:
+            if os.path.dirname(filename) == path:
                 r = mb.askokcancel("WARNING!",
                                    "You are about to overwrite the original file\n({})\nContinue?".format(filename))
                 if not r:
                     mb.showinfo(message="aborting")
                     return
+            path = os.path.join(path, os.path.basename(filename))
             key_file = os.path.join("{}_key".format(path))
             enc_file = path
             cr.Sec.create_key(key_file)
@@ -129,7 +130,7 @@ class App:
             print("done")
         except ValueError as err:
             print(err.args)
-            mb.showerror(err.args[0])
+            mb.showerror("ERROR", err.args[0])
             return
 
         mb.showinfo("done", "file '{}' encrypted,\nsaved as '{}'".format(filename, enc_file))
@@ -166,7 +167,7 @@ class App:
             print("done")
         except ValueError as err:
             print(err.args)
-            mb.showerror(err.args[0])
+            mb.showerror("ERROR", err.args[0])
             return
 
         mb.showinfo("done", "files in '{}' encrypted,\nsaved in '{}'".format(dirname, path))
@@ -201,7 +202,7 @@ class App:
             print("done")
         except ValueError as err:
             print(err.args)
-            mb.showerror(err.args[0])
+            mb.showerror("ERROR", err.args[0])
             return
         except SSHException:
             print("SSH connection to remote {}@{} failed!".format(self._remote_user, self._remote_ip))
